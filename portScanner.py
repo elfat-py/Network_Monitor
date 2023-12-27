@@ -55,5 +55,8 @@ class PortScanner:
             thread.join()
 
     def print_opened_ports(self):
-        for port in self.opened_ports:
-            print(f"The port {port}, is OPENED check it out!")
+        if len(self.opened_ports) == 0:
+            print(f"There are no opened ports on IP address: {self.target}")
+        else:
+            for port in self.opened_ports:
+                print(f"The port {port}, is OPENED check it out!")
