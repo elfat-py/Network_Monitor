@@ -38,7 +38,7 @@ class Client:
 
 if __name__ == "__main__":
     # Connection Data
-    host = '127.0.0.1'
+    host = '192.168.100.9' # This is the LAN adapter ipv4 address
     port = 55555
 
     # Create and start the client
