@@ -1,25 +1,17 @@
 import socket
 import threading
 
-
 class Client:
-    def __init__(self, nickname):
-        self.local_host = self.get_loopback_address()
-        self.client = self.request_connection()
-        self.nickname = nickname
+    def __init__(self, host, port):
+        self.nickname = input("Choose your nickname: ")
+        self.client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        self.client.connect((host, port))
 
-        self.port = 66666
-
-    def get_loopback_address(self):
-        return socket.gethostbyname("localhost")
-    def request_connection(self):
-        client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        client.connect((self.local_host, 33333))
-        return client
-
-    def listen_message(self):
+    def receive(self):
         while True:
             try:
+                # Receive Message From Server
+                # If 'NICK' Send Nickname
                 message = self.client.recv(1024).decode('ascii')
                 if message == 'NICK':
                     self.client.send(self.nickname.encode('ascii'))
@@ -36,12 +28,19 @@ class Client:
             message = '{}: {}'.format(self.nickname, input(''))
             self.client.send(message.encode('ascii'))
 
-    def start_live_connection(self):
+    def start(self):
+        # Starting Threads For Listening And Writing
+        receive_thread = threading.Thread(target=self.receive)
+        receive_thread.start()
+
         write_thread = threading.Thread(target=self.write)
         write_thread.start()
 
-        receive_thread = threading.Thread(target=self.listen_message)
-        receive_thread.start()
-client_name = input("Name: ")
-client = Client(client_name)
-client.start_live_connection()
+if __name__ == "__main__":
+    # Connection Data
+    host = '127.0.0.1'
+    port = 55555
+
+    # Create and start the client
+    chat_client = Client(host, port)
+    chat_client.start()
