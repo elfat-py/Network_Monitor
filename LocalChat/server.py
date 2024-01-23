@@ -1,13 +1,14 @@
 import socket
 import threading
 
-class Server:
+class ChatServer:
     def __init__(self, host, port):
         self.host = host
         self.port = port
         self.server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.server.bind((self.host, self.port))
         self.server.listen()
+
         self.clients = []
         self.nicknames = []
 
@@ -18,11 +19,9 @@ class Server:
     def handle(self, client):
         while True:
             try:
-                # Broadcasting Messages
                 message = client.recv(1024)
                 self.broadcast(message)
             except:
-                # Removing And Closing Clients
                 index = self.clients.index(client)
                 self.clients.remove(client)
                 client.close()
@@ -33,30 +32,28 @@ class Server:
 
     def receive(self):
         while True:
-            # Accept Connection
             client, address = self.server.accept()
             print("Connected with {}".format(str(address)))
 
-            # Request And Store Nicknames
             client.send('NICK'.encode('ascii'))
             nickname = client.recv(1024).decode('ascii')
             self.nicknames.append(nickname)
             self.clients.append(client)
 
-            # Print And Broadcast Nickname
             print("Nickname is {}".format(nickname))
             self.broadcast("{} joined!".format(nickname).encode('ascii'))
             client.send('Connected to server!'.encode('ascii'))
 
-            # Start Handling Thread For Client
             thread = threading.Thread(target=self.handle, args=(client,))
             thread.start()
 
-if __name__ == "__main__":
-    # Connection Data
-    host = '127.0.0.1' # This is the broadcast reserved IP
-    port = 55555 # Port used for communicating
+    def start_server(self):
+        print("Server is listening on {}:{}".format(self.host, self.port))
+        self.receive()
 
-    # Create and start the server
-    chat_server = Server(host, port)
-    chat_server.receive()
+# Usage
+if __name__ == "__main__":
+    host = '0.0.0.0'
+    port = 55555
+    chat_server = ChatServer(host, port)
+    chat_server.start_server()
