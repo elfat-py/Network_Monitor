@@ -1,7 +1,13 @@
-from portScanner import PortScanner
-from ddosAttack import DDOsAttack
+from NetworkTesting.portScanner import PortScanner
+from NetworkTesting.ddosAttack import DDOsAttack
+from LocalChat import client
+
+
 class Interface:
     def __init__(self):
+        self.chat_room_client = None
+        self.start_server = None
+        self.client_name = None
         self.port_scanner = None
         self.ddos_attack = None
         self.target = None
@@ -21,6 +27,8 @@ class Interface:
             self.first_option()
         elif option_selected == '2':
             self.second_option()
+        elif option_selected == '3':
+            self.third_option()
 
 
     def first_option(self):
@@ -47,12 +55,19 @@ class Interface:
         self.ddos_attack.attach_with_threads()
         self.ddos_attack.total_nr_attacks()
 
+    def third_option(self):
+        print("-----------RED room -----------")
 
-
+        while True:
+            # This should start the server
+            self.client_nickname = str(input("Provide a nickname in order to join the room chat: "))
+            self.chat_room_client = client.Client(self.client_nickname)
+            self.chat_room_client.start_live_connection()
 
 
 if __name__ == "__main__":
     interface = Interface()
     interface.options()
+
 
 
